@@ -1,21 +1,14 @@
-README
-======
+# fika-utils : a commandline survival kit for Java developers
 Paolo Lulli 2016 - paolo AT lulli.net
 
-## fika-utils : a commandline survival kit for Java developers
+fika-utils is a collection of commandline utilities to automate frequent tasks in the
+Java world such as:
 
-## What in a name
-
-Since the Java folks (and programmers in general) have totally polluted the coffee-related namespace:
-*	Java
-*	Kaffeh
-*	Caffe
-*	CoffeeScript
-*	Mocha
-
-I had to resolve for something else to name a bunch of scripts for daily survival
-in a highly IDE-driven environment. Therefore I decided to up the svedish name for
-"Coffee Break".
+*	Finding which jar contains a given Class
+*	Putting every needed jar in the CLASSPATH 
+*	Generate Ant project
+*	Recall Maven project archetype
+*	Generate a decent format for the final user
 
 ## Subcommands
 
@@ -31,3 +24,17 @@ Searching StreamFactory in /home/pielle/dev
 ..................................................................................................................................................................................................................
 /home/pielle/dev/github/shape-spring/shape-spring-web/target/shape-spring-pack/WEB-INF/lib/spring-jdbc-4.1.6.RELEASE.jar contains: [org/springframework/jdbc/datasource/embedded/OutputStreamFactory.class
 </code>
+
+## What in a name
+
+Since the Java folks (and programmers in general) have totally polluted the coffee-related namespace:
+*	Java
+*	Kaffeh
+*	Caffe
+*	CoffeeScript
+*	Mocha
+
+I had to resolve for something else to name a bunch of scripts for daily survival
+in a highly IDE-driven environment. Therefore I decided to up the svedish name for
+"Coffee Break".
+
