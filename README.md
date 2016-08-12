@@ -1,5 +1,5 @@
 # fika-utils 
-a commandline survival kit for Java developers
+A commandline survival kit for Java developers
 
 Paolo Lulli 2016 - paolo AT lulli.net
 
@@ -37,6 +37,6 @@ Since the Java folks (and programmers in general) have totally polluted the coff
 *	...
 
 I had to resolve for something else to name a bunch of scripts for daily survival
-in a highly IDE-driven environment. Therefore I decided to up the swedish name for
+in a highly IDE-driven environment. Therefore I decided to take up the swedish name for
 "Coffee Break".
 
