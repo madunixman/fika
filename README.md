@@ -1,5 +1,5 @@
 # fika-utils 
-a commandline survival kit for Java developers
+A commandline survival kit for Java developers
 
 Paolo Lulli 2016 - paolo AT lulli.net
 
