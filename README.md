@@ -22,9 +22,18 @@ This command is useful to search the jar file that contains a certain class with
 
 <code>
 fika help search:class
+
 Usage: fika search:class &lt;Classname&gt; &lt;path&gt;
 
 This command is helpful to find the jar file under path &lt;path&gt; that contains &lt;Classname&gt;
+</code>
+
+For example:
+
+=======
+Usage: fika search:class <Classname> <path>
+
+This command is helpful to find the jar file under path <path> that contains <Classname>
 </code>
 
 For example:
