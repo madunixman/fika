@@ -1,4 +1,6 @@
-# fika-utils : a commandline survival kit for Java developers
+# fika-utils 
+a commandline survival kit for Java developers
+
 Paolo Lulli 2016 - paolo AT lulli.net
 
 fika-utils is a collection of commandline utilities to automate frequent tasks in the
