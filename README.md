@@ -20,7 +20,8 @@ This command is useful to search the jar file that contains a certain class with
 
 For example:
 
-<code>fika search:class OutputStreamFactory  /home/pielle/dev 
+<code>$ fika search:class OutputStreamFactory  /home/pielle/dev 
+
 Searching StreamFactory in /home/pielle/dev
 ..................................................................................................................................................................................................................
 /home/pielle/dev/github/shape-spring/shape-spring-web/target/shape-spring-pack/WEB-INF/lib/spring-jdbc-4.1.6.RELEASE.jar contains: [org/springframework/jdbc/datasource/embedded/OutputStreamFactory.class
