@@ -1,0 +1,24 @@
+#!/usr/bin/env bash
+# Usage: fika search:class <Classname> <path>
+# Summary: Search the class <Classname> in the jars under <path>
+# Help: This command is helpful to find the jar file under path <path> that contains <Classname>
+
+
+if [ $# -ne 2 ]; then
+	echo "Bad param numbers: see manual"
+	exit;
+else
+	CLASSNAME=$1
+	SEARCH_PATH=$2
+	echo "Searching $CLASSNAME in $SEARCH_PATH"
+	for j in $(find $SEARCH_PATH -type f -name *.jar); do
+		echo -ne "."
+		res=$(jar tf $j | grep $CLASSNAME)
+		if [ ! "$res" = "" ]; then
+			echo ""
+			echo "$j contains: [$res]"
+		fi
+	done
+	echo ""
+	echo "Analysis completed"
+fi
