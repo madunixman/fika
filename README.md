@@ -7,10 +7,10 @@ fika-utils is a collection of commandline utilities to automate frequent tasks i
 Java world such as:
 
 *	Finding which jar contains a given Class
-*	Putting every needed jar in the CLASSPATH 
-*	Generate Ant project
-*	Recall Maven project archetype
-*	Generate a decent format for the final user
+*	Putting every needed jar in the CLASSPATH (TODO)
+*	Generate Ant project                      (TODO)
+*	Recall Maven project archetype            (TODO)
+*	Generate a decent format for the final user (TODO)
 
 ## Subcommands
 
