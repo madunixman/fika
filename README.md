@@ -27,6 +27,15 @@ Searching StreamFactory in /home/pielle/dev
 /home/pielle/dev/github/shape-spring/shape-spring-web/target/shape-spring-pack/WEB-INF/lib/spring-jdbc-4.1.6.RELEASE.jar contains: [org/springframework/jdbc/datasource/embedded/OutputStreamFactory.class
 </code>
 
+### fika project:maven &lt;project-name&gt;
+
+This command generates a Maven project
+
+
+### fika project:ant &lt;project-name&gt;
+
+This command generates an Ant project
+
 ## What in a name
 
 Since the Java folks (and programmers in general) have totally polluted the coffee-related namespace:
