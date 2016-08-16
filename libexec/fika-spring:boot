@@ -1,0 +1,62 @@
+#! /usr/bin/env bash
+# Usage: fika [ spring:boot | -sb | --spring-boot ] <project-name> 
+# Summary: creates a new Spring Boot project <project-name> containing a groovy file
+# Help: This command is useful to create a new Spring Boot project 
+
+
+if [ $# -ne 1 ]; then
+	echo "Bad param numbers: see manual"
+	exit;
+else
+	sbootscript=$(which spring)
+	if [ "${sbootscript}" = "" ]; then
+		echo "Spring boot not installed: see manual"
+		exit;
+	fi
+	PROJECTNAME=$1
+	lowProject=$(echo "$PROJECTNAME" | tr '[:upper:]' '[:lower:]')
+	if [ "$MVN_GROUPID" = "" ]; then
+		echo -ne "Group Id: "; read mvn_groupid
+	else
+		mvn_groupid=${MVN_GROUPID}
+	fi 
+	
+	echo -ne "Description: "; read mvn_description
+	mkdir -p ${lowProject}
+
+ 	cat<<__EOD__> ${lowProject}/"build.sh"
+	#! /bin/bash
+	
+	cd \$(dirname \$0);
+	currdir=\$(pwd)
+	
+	spring jar \${currdir}/${lowProject}.jar \${currdir}/${lowProject}.groovy
+__EOD__
+ 	cat<<__EOD__> ${lowProject}/$lowProject".groovy"
+@Controller
+class A${lowProject} {
+
+    @RequestMapping("/${lowProject}/{name}")
+    @ResponseBody
+    String home(@PathVariable String name) {
+        return "Hello "+name;
+    }
+
+}
+__EOD__
+	spring jar ${lowProject}/${lowProject}.jar ${lowProject}/${lowProject}.groovy
+ 	cat<<__EOD__> ${lowProject}/$lowProject".sh"
+#! /bin/bash -x
+
+server_port=8081
+
+cd \$(dirname \$0); currdir=$(pwd)
+
+java -Dserver.port=\${server_port} -jar ${lowProject}.jar
+
+__EOD__
+
+chmod 755 ${lowProject}/$lowProject".sh"
+chmod 755 ${lowProject}/"build.sh"
+
+fi

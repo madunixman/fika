@@ -40,6 +40,11 @@ This command generates a Maven project
 
 This command generates an Ant project
 
+
+### fika [ spring:boot | -sb | --spring-boot ]   &lt;project-name&gt;
+
+This command generates a Spring Boot project
+
 ## What in a name
 
 Since the Java folks (and programmers in general) have totally polluted the coffee-related namespace:

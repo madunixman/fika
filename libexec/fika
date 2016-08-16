@@ -52,6 +52,10 @@ case "$command" in
   shift
   exec fika-libs "$@"
   ;;
+"-sb" | "--spring-boot" )
+  shift
+  exec fika-spring:boot "$@"
+  ;;
 * )
   command_path="$(command -v "fika-$command" || true)"
   if [ ! -x "$command_path" ]; then
