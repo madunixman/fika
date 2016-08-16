@@ -1,0 +1,134 @@
+#! /usr/bin/env bash
+# Usage: fika [ project:android | -A | --project-android ]  <project-name> 
+# Summary: creates a new Android project <project-name> in the current directory
+# Help: This command is useful to create usual android boilerplate for dead-simple projects
+
+
+if [ $# -ne 1 ]; then
+	echo "Bad param numbers: see manual"
+	exit;
+else
+	PROJECTNAME=$1
+	lowProject=$(echo "$PROJECTNAME" | tr '[:upper:]' '[:lower:]')
+	if [ "$MVN_GROUPID" = "" ]; then
+		echo -ne "Group Id: "; read mvn_groupid
+	else
+		mvn_groupid=${MVN_GROUPID}".android"
+	fi 
+	
+	echo -ne "Description: "; read mvn_description
+	mkdir -p ${PROJECTNAME}/src/main/java
+	mkdir -p ${PROJECTNAME}/src/main/res/layout
+	mkdir -p ${PROJECTNAME}/src/main/res/values
+	mkdir -p ${PROJECTNAME}/gen
+	
+ 	cat<<__EOD__>${PROJECTNAME}/pom.xml
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>${mvn_groupid}</groupId>
+    <artifactId>${lowProject}</artifactId>
+    <version>0.1.0</version>
+    <packaging>apk</packaging>
+
+    <properties>
+        <!-- use UTF-8 for everything -->
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+    </properties>
+
+    <dependencies>
+<!--  E.G.: 
+        <dependency>
+	<groupId>net.lulli.android</groupId>
+    	<artifactId>android-metadao</artifactId>
+    	<version>1.0.0</version>
+        </dependency>
+ -->
+        <dependency>
+            <groupId>com.google.android</groupId>
+            <artifactId>android</artifactId>
+            <version>4.1.1.4</version>
+            <scope>provided</scope>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>com.jayway.maven.plugins.android.generation2</groupId>
+                <artifactId>android-maven-plugin</artifactId>
+                <!--<version>3.9.0-rc.1</version> -->
+                <version>4.0.0-rc.2</version> 
+                <configuration>
+                    <sdk>
+			 <path>\${env.ANDROID_HOME}</path>
+                        <platform>23</platform>
+                    </sdk>
+                    <deleteConflictingFiles>true</deleteConflictingFiles>
+                    <undeployBeforeDeploy>true</undeployBeforeDeploy>
+                </configuration>
+                <extensions>true</extensions>
+            </plugin>
+            <plugin>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.3</version> 
+                <configuration>
+                    <source>1.7</source>
+                    <target>1.7</target>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+
+<!--  E.G.: 
+    <organization>
+    	<name>lulli.net</name>
+    	<url>http://www.lulli.net</url>
+    </organization>
+-->
+</project>
+__EOD__
+
+cat<<__EOD__>${PROJECTNAME}/src/main/res/values/string.xml
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Android Maven</string>
+</resources>
+__EOD__
+
+cat<<__EOD__>${PROJECTNAME}/project.properties
+# Project target.
+target=android-23
+__EOD__
+
+cat<<__EOD__>${PROJECTNAME}/src/main/res/values/string.xml
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Android Maven</string>
+</resources>
+__EOD__
+
+cat<<__EOD__>${PROJECTNAME}/src/main/AndroidManifest.xml
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="org.hello"
+    android:versionCode="1"
+    android:versionName="1.0.1" >
+
+    <application android:label="@string/app_name" >
+        <activity
+            android:name=".HelloActivity"
+            android:label="@string/app_name" >
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+    </application>
+
+</manifest>
+__EOD__
+
+fi
