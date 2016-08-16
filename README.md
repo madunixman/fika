@@ -9,8 +9,8 @@ Java world such as:
 *	Finding which jar contains a given Class
 *	Generate Ant project                      
 *	Recall Maven project archetype            
-*	Putting every needed jar in the CLASSPATH (TODO)
-*	Generate a decent format for the final user (TODO)
+*	Putting every needed jar in the CLASSPATH 
+*	Generate a decent format for the final user 
 
 ## Subcommands
 
