@@ -28,6 +28,26 @@ case "$command" in
 "" | "-h" | "--help" )
   exec fika-help
   ;;
+"-s" | "--search-class" )
+  shift
+  exec fika-search:class "$@"
+  ;;
+"-pa" | "--project-ant" )
+  shift
+  exec fika-project:ant "$@"
+  ;;
+"-pm" | "--project-maven" )
+  shift
+  exec fika-project:maven "$@"
+  ;;
+"-a" | "--assembly" )
+  shift
+  exec fika-assembly "$@"
+  ;;
+"-l" | "--libs" )
+  shift
+  exec fika-libs "$@"
+  ;;
 * )
   command_path="$(command -v "fika-$command" || true)"
   if [ ! -x "$command_path" ]; then

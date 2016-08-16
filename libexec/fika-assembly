@@ -1,0 +1,41 @@
+#!/usr/bin/env bash
+# Usage: fika assembly | -a | --assembly fully.qualified.class.Name
+# Summary: builds an assembly with every jar dependency and a Name.sh shell script
+# Help: this command builds an assembly with every jar dependency and a  shell script
+
+CURRDIR=$(pwd)
+cd ${CURRDIR}
+
+MAIN_CLASS=$1
+ONLY_CLASS=$(echo ${MAIN_CLASS}| sed -e 's/\./\//g' | xargs basename)
+JARDIR=${CURRDIR}/lib
+SCRIPTSDIR=${CURRDIR}/script
+SCRIPT_FILE=${SCRIPTSDIR}/${ONLY_CLASS}".sh"
+#SCRIPT_FILE=${SCRIPTSDIR}/${ONLY_CLASS}
+
+if [ $# -ne 1 ]; then
+        echo "Bad param numbers: see manual"
+        exit;
+else
+	test -d ${JARDIR} || mkdir -p ${JARDIR}
+	test -d ${SCRIPTSDIR} || mkdir -p ${SCRIPTSDIR}
+
+	mvn  dependency:build-classpath -Dmdep.outputFile=${CURRDIR}/classpath.txt 2>&1>/dev/null
+
+	for j in $(cat ${CURRDIR}/classpath.txt | sed -e 's/\:/ /g'); do
+		cp $j ${JARDIR}
+	done
+
+	echo '#! /bin/bash' > ${SCRIPT_FILE}
+	echo "" >> ${SCRIPT_FILE}
+	echo "LIBDIR=./lib" >> ${SCRIPT_FILE}
+	echo "" >> ${SCRIPT_FILE}
+
+	cd ${JARDIR}
+	for l in *.jar; do
+		echo "CP=\${CP}:\${LIBDIR}/${l}">> ${SCRIPT_FILE}
+	done
+	echo "" >> ${SCRIPT_FILE}
+	echo "java -cp \${CP} ${MAIN_CLASS}" >> ${SCRIPT_FILE}
+	chmod 755 ${SCRIPT_FILE}
+fi

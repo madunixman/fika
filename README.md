@@ -14,25 +14,25 @@ Java world such as:
 
 ## Subcommands
 
-### fika search:class &lt;Classname&gt; &lt;path&gt;
+### fika [ search:class | -s | --search-class ] &lt;Classname&gt; &lt;path&gt;
 
 This command is useful to search the jar file that contains a certain class within a given path:
 
 For example:
 
-<code>$ fika search:class OutputStreamFactory  /home/pielle/dev 
+<code>$ fika  -s  OutputStreamFactory  /home/pielle/dev 
 
 Searching StreamFactory in /home/pielle/dev
 ..................................................................................................................................................................................................................
 /home/pielle/dev/github/shape-spring/shape-spring-web/target/shape-spring-pack/WEB-INF/lib/spring-jdbc-4.1.6.RELEASE.jar contains: [org/springframework/jdbc/datasource/embedded/OutputStreamFactory.class
 </code>
 
-### fika project:maven &lt;project-name&gt;
+### fika [ project:maven | -pm | --project-maven ]  &lt;project-name&gt;
 
 This command generates a Maven project
 
 
-### fika project:ant &lt;project-name&gt;
+### fika [ project:ant | -pa | --project-ant ] &lt;project-name&gt;
 
 This command generates an Ant project
 

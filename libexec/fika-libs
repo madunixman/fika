@@ -1,0 +1,15 @@
+#!/usr/bin/env bash
+# Usage: fika libs | -l | --libs
+# Summary: puts every jar dependency into ./lib
+# Help: this command puts every jar dependency into ./lib
+
+CURRDIR=$(pwd)
+cd ${CURRDIR}
+
+JARDIR=${CURRDIR}/lib
+test -d ${JARDIR} || mkdir -p ${JARDIR}
+mvn  dependency:build-classpath -Dmdep.outputFile=${CURRDIR}/classpath.txt 2>&1>/dev/null
+
+for j in $(cat ${CURRDIR}/classpath.txt | sed -e 's/\:/ /g'); do
+	cp $j ${JARDIR}
+done
