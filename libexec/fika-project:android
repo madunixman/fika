@@ -131,4 +131,5 @@ cat<<__EOD__>${PROJECTNAME}/src/main/AndroidManifest.xml
 </manifest>
 __EOD__
 
+cd ${PROJECTNAME}; mvn eclipse:eclipse 2>&1> /dev/null &
 fi
