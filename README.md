@@ -27,6 +27,10 @@ Searching StreamFactory in /home/pielle/dev
 /home/pielle/dev/github/shape-spring/shape-spring-web/target/shape-spring-pack/WEB-INF/lib/spring-jdbc-4.1.6.RELEASE.jar contains: [org/springframework/jdbc/datasource/embedded/OutputStreamFactory.class
 </code>
 
+### fika [ project:android | -pA | --project-android ]  &lt;project-name&gt;
+
+This command generates an Android project
+
 ### fika [ project:maven | -pm | --project-maven ]  &lt;project-name&gt;
 
 This command generates a Maven project
