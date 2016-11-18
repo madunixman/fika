@@ -35,6 +35,10 @@ This command generates an Android project
 
 This command generates a Maven project
 
+### fika [ project:servlet | -ps | --project-servlet ]  &lt;project-name&gt;
+
+This command generates a web project. The fastest web project, ever.
+
 
 ### fika [ project:ant | -pa | --project-ant ] &lt;project-name&gt;
 

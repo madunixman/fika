@@ -44,6 +44,10 @@ case "$command" in
   shift
   exec fika-project:maven "$@"
   ;;
+"-ps" | "--project-servlet" )
+  shift
+  exec fika-project:servlet "$@"
+  ;;
 "-a" | "--assembly" )
   shift
   exec fika-assembly "$@"

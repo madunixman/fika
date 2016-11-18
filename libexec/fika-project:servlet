@@ -1,0 +1,110 @@
+#! /usr/bin/env bash
+# Usage: fika project:servlet <project-name> 
+# Summary: creates a new web project <project-name> in the current directory
+# Help: This command is useful to create usual maven boilerplate for dead-simple projects
+
+
+if [ $# -ne 1 ]; then
+	echo "Bad param numbers: see manual"
+	exit;
+else
+	PROJECTNAME=$1
+	lowProject=$(echo "$PROJECTNAME" | tr '[:upper:]' '[:lower:]')
+	if [ "$MVN_GROUPID" = "" ]; then
+		echo -ne "Group Id: "; read mvn_groupid
+	else
+		mvn_groupid=${MVN_GROUPID}
+	fi 
+	
+	echo -ne "Description: "; read mvn_description
+	mkdir -p ${PROJECTNAME}/src/main/java
+	mkdir -p ${PROJECTNAME}/src/main/resources
+	mkdir -p ${PROJECTNAME}/src/main/webapp
+	mkdir -p ${PROJECTNAME}/src/main/webapp/WEB-INF
+	mkdir -p ${PROJECTNAME}/src/test/java
+	mkdir -p ${PROJECTNAME}/src/test/resources
+ 	cat<<__EOD__>${PROJECTNAME}/src/main/webapp/index.html
+<html>
+<head><title>${PROJECTNAME}</title></head>
+<body><h1>${PROJECTNAME}</h1>
+
+</body>
+</html>
+__EOD__
+ 	cat<<__EOD__>${PROJECTNAME}/src/main/webapp/WEB-INF/web.xml
+<!DOCTYPE web-app PUBLIC
+ "-//Sun Microsystems, Inc.//DTD Web Application 2.3//EN"
+ "http://java.sun.com/dtd/web-app_2_3.dtd" >
+
+<web-app>
+  <display-name>${PROJECTNAME}</display-name>
+  <welcome-file-list>
+    <welcome-file>index.html</welcome-file>
+    <!-- No fucking jsp in here -->
+  </welcome-file-list>
+  <servlet>
+    <description></description>
+    <display-name>${PROJECTNAME}</display-name>
+    <servlet-name>${PROJECTNAME}</servlet-name>
+    <servlet-class>${MVN_GROUPID}.${PROJECTNAME}</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>${PROJECTNAME}</servlet-name>
+    <url-pattern>/${PROJECTNAME}</url-pattern>
+  </servlet-mapping>
+
+</web-app>
+__EOD__
+ 	cat<<__EOD__>${PROJECTNAME}/pom.xml
+<project>
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>${mvn_groupid}.${lowProject}</groupId>
+  <artifactId>${PROJECTNAME}</artifactId>
+  <packaging>war</packaging>
+  <version>0.0.1</version>
+  <description>${mvn_description}</description>
+  <!-- homepage for the project  ${PROJECTNAME}-->
+  <!-- EG: <url>http://dev.lulli.net/projects/${PROJECTNAME}</url>-->
+<!-- for distribution of artifact into the repo -->
+<!-- ****************************************** -->
+<build>
+ <extensions>
+    <extension>
+        <groupId>org.apache.maven.wagon</groupId>
+        <artifactId>wagon-ssh</artifactId>
+        <version>2.8</version>
+    </extension>
+ </extensions>
+</build>
+<!-- 
+ Kindly include the following params into your settings.xml
+ if you want to upload to your own repo 
+-->
+<distributionManagement>
+    <repository>
+      <id>\${repository.id}</id>
+      <name>\${repository.name}</name>
+      <url>\${repository.url}</url>
+    </repository>
+    <site>
+      <id>\${repository.id}</id>
+      <name>\${repository.name}</name>
+      <url>\${repository.site.url}</url>
+    </site>
+</distributionManagement>
+<!-- ****************************************** -->
+
+<dependencies>
+  <dependency>
+    <groupId>log4j</groupId>
+    <artifactId>log4j</artifactId>
+    <version>1.2.17</version>
+  </dependency>
+</dependencies>
+
+
+</project>
+__EOD__
+
+
+fi

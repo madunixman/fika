@@ -33,7 +33,10 @@ else
 	spring jar \${currdir}/${lowProject}.jar \${currdir}/${lowProject}.groovy
 __EOD__
  	cat<<__EOD__> ${lowProject}/$lowProject".groovy"
+import javax.annotation.security.RunAs
+
 @Controller
+@RunAs("role-${lowProject}")
 class A${lowProject} {
 
     @RequestMapping("/${lowProject}/{name}")
