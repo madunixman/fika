@@ -25,12 +25,12 @@ else
 	mkdir -p ${lowProject}
 
  	cat<<__EOD__> ${lowProject}/"build.sh"
-	#! /bin/bash
-	
-	cd \$(dirname \$0);
-	currdir=\$(pwd)
-	
-	spring jar \${currdir}/${lowProject}.jar \${currdir}/${lowProject}.groovy
+#! /bin/bash
+
+cd \$(dirname \$0);
+currdir=\$(pwd)
+
+spring jar \${currdir}/${lowProject}.jar \${currdir}/${lowProject}.groovy
 __EOD__
  	cat<<__EOD__> ${lowProject}/$lowProject".groovy"
 import javax.annotation.security.RunAs

@@ -48,6 +48,14 @@ case "$command" in
   shift
   exec fika-project:servlet "$@"
   ;;
+"-pr" | "--project-rest" )
+  shift
+  exec fika-project:rest "$@"
+  ;;
+"-pj" | "--project-json" )
+  shift
+  exec fika-project:json "$@"
+  ;;
 "-a" | "--assembly" )
   shift
   exec fika-assembly "$@"

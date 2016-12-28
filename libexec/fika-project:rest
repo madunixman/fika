@@ -31,6 +31,71 @@ else
 </body>
 </html>
 __EOD__
+cat<<__EOD__>${PROJECTNAME}/src/main/java/${PROJECTNAME^}.java
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.core.Response;
+
+@Path("/users")
+public class ${PROJECTNAME^} { //Rename me as you wish
+
+	@GET
+	public Response getUser() {
+
+		return Response.status(200).entity("getUser is called").build();
+
+	}
+
+	@GET
+	@Path("/vip")
+	public Response getUserVIP() {
+
+		return Response.status(200).entity("getUserVIP is called").build();
+
+	}
+
+	@GET
+	@Path("{name}")
+	public Response getUserByName(@PathParam("name") String name) {
+
+		return Response.status(200)
+				.entity("getUserByName is called, name : " + name).build();
+
+	}
+
+	@GET
+	@Path("{id : \\\\d+}")
+	public Response getUserById(@PathParam("id") String id) {
+
+		return Response.status(200).entity("getUserById is called, id : " + id)
+				.build();
+
+	}
+
+	@GET
+	@Path("/username/{username : [a-zA-Z][a-zA-Z_0-9]}")
+	public Response getUserByUserName(@PathParam("username") String username) {
+
+		return Response.status(200)
+				.entity("getUserByUserName is called, username : " + username)
+				.build();
+
+	}
+
+	@GET
+	@Path("/books/{isbn : \\\\d+}")
+	public Response getUserBookByISBN(@PathParam("isbn") String isbn) {
+
+		return Response.status(200)
+				.entity("getUserBookByISBN is called, isbn : " + isbn).build();
+
+	}
+
+}
+
+
+__EOD__
  	cat<<__EOD__>${PROJECTNAME}/src/main/webapp/WEB-INF/web.xml
 <!DOCTYPE web-app PUBLIC
  "-//Sun Microsystems, Inc.//DTD Web Application 2.3//EN"
@@ -38,20 +103,25 @@ __EOD__
 
 <web-app>
   <display-name>${PROJECTNAME}</display-name>
-  <welcome-file-list>
-    <welcome-file>index.html</welcome-file>
-    <!-- No fucking jsp in here -->
-  </welcome-file-list>
-  <servlet>
-    <description></description>
-    <display-name>${PROJECTNAME}</display-name>
-    <servlet-name>${PROJECTNAME}</servlet-name>
-    <servlet-class>${MVN_GROUPID}.${PROJECTNAME}</servlet-class>
-  </servlet>
-  <servlet-mapping>
-    <servlet-name>${PROJECTNAME}</servlet-name>
-    <url-pattern>/${PROJECTNAME}</url-pattern>
-  </servlet-mapping>
+	<context-param>
+		<param-name>resteasy.scan</param-name>
+		<param-value>true</param-value>
+	</context-param>
+
+	<listener>
+		<listener-class>
+			org.jboss.resteasy.plugins.server.servlet.ResteasyBootstrap</listener-class>
+	</listener>
+	<servlet>
+		<servlet-name>resteasy-servlet</servlet-name>
+		<servlet-class>
+			org.jboss.resteasy.plugins.server.servlet.HttpServletDispatcher</servlet-class>
+	</servlet>
+
+	<servlet-mapping>
+		<servlet-name>resteasy-servlet</servlet-name>
+		<url-pattern>/*</url-pattern>
+	</servlet-mapping>
 
 </web-app>
 __EOD__
@@ -75,6 +145,21 @@ __EOD__
         <version>2.8</version>
     </extension>
  </extensions>
+<!--  For ReastEasy build -->
+		<finalName>${PROJECTNAME}</finalName>
+		<plugins>
+			<plugin>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<configuration>
+				<!--
+					<source>1.6</source>
+					<target>1.6</target>
+				-->
+				</configuration>
+			</plugin>
+		</plugins>
+<!--  For ReastEasy build -->
+
 </build>
 <!-- 
  Kindly include the following params into your settings.xml
@@ -101,11 +186,11 @@ __EOD__
     <version>1.2.17</version>
   </dependency>
 <dependency>
-        <groupId>javax.servlet</groupId>
-        <artifactId>javax.servlet-api</artifactId>
-        <version>3.0.1</version>
-        <scope>provided</scope>
+	<groupId>org.jboss.resteasy</groupId>
+	<artifactId>resteasy-jaxrs</artifactId>
+	<version>2.2.1.GA</version>
 </dependency>
+
 </dependencies>
 
 
