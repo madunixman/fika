@@ -9,6 +9,7 @@ Java world such as:
 *	Finding which jar contains a given Class
 *	Generate Ant project                      
 *	Recall Maven project archetype            
+*	Generate a Scala project that builds with either Maven or Sbt
 *	Putting every needed jar in the CLASSPATH 
 *	Generate a decent format for the final user 
 
