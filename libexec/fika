@@ -40,6 +40,10 @@ case "$command" in
   shift
   exec fika-project:android "$@"
   ;;
+"-pS" | "--project-scala" )
+  shift
+  exec fika-project:scala "$@"
+  ;;
 "-pm" | "--project-maven" )
   shift
   exec fika-project:maven "$@"

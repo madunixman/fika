@@ -1,0 +1,133 @@
+#! /usr/bin/env bash
+# Usage: fika project:scala <project-name> 
+# Summary: creates a new Scala project <project-name> in the current directory
+# Help: This command is useful to create usual maven boilerplate for dead-simple projects
+
+
+if [ $# -ne 1 ]; then
+	echo "Bad param numbers: see manual"
+	exit;
+else
+	PROJECTNAME=$1
+	lowProject=$(echo "$PROJECTNAME" | tr '[:upper:]' '[:lower:]')
+	if [ "$MVN_GROUPID" = "" ]; then
+		echo -ne "Group Id: "; read mvn_groupid
+	else
+		mvn_groupid=${MVN_GROUPID}
+	fi 
+	
+	echo -ne "Description: "; read mvn_description
+	mkdir -p ${PROJECTNAME}/project
+	mkdir -p ${PROJECTNAME}/src/main/scala
+	mkdir -p ${PROJECTNAME}/src/main/resources
+	mkdir -p ${PROJECTNAME}/src/main/webapp
+	mkdir -p ${PROJECTNAME}/src/test/scala
+	mkdir -p ${PROJECTNAME}/src/test/resources
+ 	cat<<__EOD__>${PROJECTNAME}/pom.xml
+<project>
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>${mvn_groupid}.${lowProject}</groupId>
+  <artifactId>${PROJECTNAME}</artifactId>
+  <version>0.0.1</version>
+  <description>${mvn_description}</description>
+  <!-- homepage for the project  ${PROJECTNAME}-->
+  <!-- EG: <url>http://dev.lulli.net/projects/${PROJECTNAME}</url>-->
+
+  <properties>
+    <encoding>UTF-8</encoding>
+    <scala.version>2.11.6</scala.version>
+  </properties>
+
+  <dependencies>
+    <dependency>
+      <groupId>org.scala-lang</groupId>
+      <artifactId>scala-library</artifactId>
+      <version>\${scala.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.scalatest</groupId>
+      <artifactId>scalatest_2.11</artifactId>
+      <version>2.2.5</version>
+      <scope>compile</scope>
+    </dependency>
+  </dependencies>
+
+<!-- for distribution of artifact into the repo -->
+<!-- ****************************************** -->
+<build>
+ <extensions>
+    <extension>
+        <groupId>org.apache.maven.wagon</groupId>
+        <artifactId>wagon-ssh</artifactId>
+        <version>2.8</version>
+    </extension>
+ </extensions>
+    <plugins>
+      <plugin>
+        <groupId>org.scala-tools</groupId>
+        <artifactId>maven-scala-plugin</artifactId>
+        <version>2.15.2</version>
+        <executions>
+          <execution>
+            <goals>
+              <goal>compile</goal>
+              <goal>testCompile</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+
+      <plugin>
+        <groupId>org.scalatest</groupId>
+        <artifactId>scalatest-maven-plugin</artifactId>
+        <version>1.0</version>
+        <configuration>
+        </configuration>
+        <executions>
+          <execution>
+            <id>test</id>
+            <goals>
+              <goal>test</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+
+    </plugins>
+</build>
+<!-- 
+ Kindly include the following params into your settings.xml
+ if you want to upload to your own repo 
+-->
+<distributionManagement>
+    <repository>
+      <id>\${repository.id}</id>
+      <name>\${repository.name}</name>
+      <url>\${repository.url}</url>
+    </repository>
+    <site>
+      <id>\${repository.id}</id>
+      <name>\${repository.name}</name>
+      <url>\${repository.site.url}</url>
+    </site>
+</distributionManagement>
+<!-- ****************************************** -->
+
+</project>
+__EOD__
+
+ 	cat<<__EOD__>${PROJECTNAME}/build.sbt
+import com.github.retronym.SbtOneJar._
+
+scalaVersion := "2.12.2"
+oneJarSettings
+
+libraryDependencies += "commons-lang" % "commons-lang" % "2.6"
+__EOD__
+
+ 	cat<<__EOD__>${PROJECTNAME}/project/plugins.sbt
+addSbtPlugin("org.scala-sbt.plugins" % "sbt-onejar" % "0.8")
+__EOD__
+
+fi

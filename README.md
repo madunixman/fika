@@ -49,6 +49,10 @@ This command generates an Ant project
 
 This command generates a Spring Boot project
 
+### fika [ project:scala | -pS | --project-scala ]   &lt;project-name&gt;
+
+This command generates a Scala project
+
 ## What in a name
 
 Since the Java folks (and programmers in general) have totally polluted the coffee-related namespace:
