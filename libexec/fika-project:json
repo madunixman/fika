@@ -24,12 +24,24 @@ else
 	mkdir -p ${PROJECTNAME}/src/main/webapp/WEB-INF/classes
 	mkdir -p ${PROJECTNAME}/src/test/java
 	mkdir -p ${PROJECTNAME}/src/test/resources
+	mkdir -p ${PROJECTNAME}/script
 
 cat<<__EOD__>${PROJECTNAME}/src/main/webapp/WEB-INF/classes/logging.properties
 org.apache.catalina.core.ContainerBase.[Catalina].level = INFO
 org.apache.catalina.core.ContainerBase.[Catalina].handlers = java.util.logging.ConsoleHandler
 __EOD__
 
+cat<<__EOD__>${PROJECTNAME}/script/test.sh
+#! /bin/bash -x
+
+ENDPOINT=http://127.0.0.1:8080/${PROJECTNAME}/json/item/post
+
+curl -H "Content-Type: application/json" \\
+        --data  '{"a":"aaa-string", "b":"bbb-string"}' \\
+        \${ENDPOINT}
+__EOD__
+
+chmod 755 ${PROJECTNAME}/script/test.sh
 
 cat<<__EOD__>${PROJECTNAME}/src/main/webapp/index.html
 <html>
