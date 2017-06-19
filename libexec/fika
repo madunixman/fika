@@ -60,6 +60,10 @@ case "$command" in
   shift
   exec fika-project:json "$@"
   ;;
+"-pd" | "--project-metadao" )
+  shift
+  exec fika-project:metadao "$@"
+  ;;
 "-a" | "--assembly" )
   shift
   exec fika-assembly "$@"

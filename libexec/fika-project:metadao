@@ -1,0 +1,241 @@
+#! /usr/bin/env bash
+# Usage: fika <project:metadao | -pd | --project-metadao> <project-name> 
+# Summary: creates a new scala/java project <project-name> in the current directory
+# Help: This command is useful to create maven/sbt boilerplate for java and
+# scala projects that make use of the MetaDao library for persistence on database
+
+
+if [ $# -ne 1 ]; then
+	echo "Bad param numbers: see manual"
+	exit;
+else
+	PROJECTNAME=$1
+	lowProject=$(echo "$PROJECTNAME" | tr '[:upper:]' '[:lower:]')
+	if [ "$MVN_GROUPID" = "" ]; then
+		echo -ne "Group Id: "; read mvn_groupid
+	else
+		mvn_groupid=${MVN_GROUPID}
+	fi 
+	
+	echo -ne "Description: "; read mvn_description
+	mkdir -p ${PROJECTNAME}/project
+	mkdir -p ${PROJECTNAME}/script
+	mkdir -p ${PROJECTNAME}/src/main/scala
+	mkdir -p ${PROJECTNAME}/src/main/resources
+	mkdir -p ${PROJECTNAME}/src/main/webapp
+	mkdir -p ${PROJECTNAME}/src/test/scala
+	mkdir -p ${PROJECTNAME}/src/test/resources
+ 	cat<<__EOD__>${PROJECTNAME}/pom.xml
+<project>
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>${mvn_groupid}.${lowProject}</groupId>
+  <artifactId>${PROJECTNAME}</artifactId>
+  <version>0.0.1</version>
+  <description>${mvn_description}</description>
+  <!-- homepage for the project  ${PROJECTNAME}-->
+  <!-- EG: <url>http://dev.lulli.net/projects/${PROJECTNAME}</url>-->
+
+  <properties>
+    <encoding>UTF-8</encoding>
+    <scala.version>2.11.6</scala.version>
+  </properties>
+
+<repositories>
+           <repository>
+              <id>dev.lulli.net</id>
+              <url>http://dev.lulli.net/maven</url>
+            </repository>
+ </repositories>
+
+  <dependencies>
+    <dependency>
+      <groupId>org.scala-lang</groupId>
+      <artifactId>scala-library</artifactId>
+      <version>\${scala.version}</version>
+    </dependency>
+
+
+    <dependency>
+      <groupId>org.scalatest</groupId>
+      <artifactId>scalatest_2.11</artifactId>
+      <version>2.2.5</version>
+      <scope>compile</scope>
+    </dependency>
+
+<dependency>
+        <groupId>net.lulli</groupId>
+        <artifactId>metadao</artifactId>
+        <version>1.0.2</version>
+</dependency>
+
+<!-- SQlite JDBC -->
+<dependency>
+    <groupId>org.xerial</groupId>
+    <artifactId>sqlite-jdbc</artifactId>
+    <version>3.15.1</version>
+</dependency>
+
+<!--
+
+For CASSANDRA:
+  <dependency>
+     <groupId>com.github.adejanovski</groupId>
+     <artifactId>cassandra-jdbc-wrapper</artifactId>
+     <version>3.1.0</version>
+   </dependency>
+</dependencies>
+
+
+Postgres
+ <dependency>
+     <groupId>org.postgresql</groupId>
+     <artifactId>postgresql</artifactId>
+     <version>9.4.1208.jre7</version>
+ </dependency>
+
+MySQL
+                <dependency>
+                        <groupId>mysql</groupId>
+                        <artifactId>mysql-connector-java</artifactId>
+                        <version>\${mysql.version}</version>
+                </dependency>
+
+-->
+
+
+
+
+  </dependencies>
+
+<!-- for distribution of artifact into the repo -->
+<!-- ****************************************** -->
+<build>
+ <extensions>
+    <extension>
+        <groupId>org.apache.maven.wagon</groupId>
+        <artifactId>wagon-ssh</artifactId>
+        <version>2.8</version>
+    </extension>
+ </extensions>
+    <plugins>
+      <plugin>
+        <groupId>org.scala-tools</groupId>
+        <artifactId>maven-scala-plugin</artifactId>
+        <version>2.15.2</version>
+        <executions>
+          <execution>
+            <goals>
+              <goal>compile</goal>
+              <goal>testCompile</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+
+      <plugin>
+        <groupId>org.scalatest</groupId>
+        <artifactId>scalatest-maven-plugin</artifactId>
+        <version>1.0</version>
+        <configuration>
+        </configuration>
+        <executions>
+          <execution>
+            <id>test</id>
+            <goals>
+              <goal>test</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+
+    </plugins>
+</build>
+<!-- 
+ Kindly include the following params into your settings.xml
+ if you want to upload to your own repo 
+-->
+<distributionManagement>
+    <repository>
+      <id>\${repository.id}</id>
+      <name>\${repository.name}</name>
+      <url>\${repository.url}</url>
+    </repository>
+    <site>
+      <id>\${repository.id}</id>
+      <name>\${repository.name}</name>
+      <url>\${repository.site.url}</url>
+    </site>
+</distributionManagement>
+<!-- ****************************************** -->
+
+</project>
+__EOD__
+
+ 	cat<<__EOD__>${PROJECTNAME}/build.sbt
+libraryDependencies += "commons-lang" % "commons-lang" % "2.6"
+libraryDependencies += "net.lulli" % "metadao" % "1.0.2"
+libraryDependencies += "org.xerial" % "sqlite-jdbc" % "3.15.1"
+
+resolvers += DefaultMavenRepository
+resolvers += "dev.lulli.net" at "http://dev.lulli.net/maven"
+
+__EOD__
+
+ 	cat<<__EOD__>${PROJECTNAME}/project/plugins.sbt
+addSbtPlugin("org.scala-sbt.plugins" % "sbt-onejar" % "0.8")
+__EOD__
+
+ 	cat<<__EOD__>${PROJECTNAME}/script/properties
+database.sqlite.JDBC_URL=jdbc:sqlite:/tmp/test.db
+database.sqlite.DRIVER_CLASS_NAME=org.sqlite.JDBC
+database.sqlite.DB_USER=
+database.sqlite.DB_PASSWORD=
+__EOD__
+ 	cat<<__EOD__>${PROJECTNAME}/src/main/scala/MainWriter.scala
+
+//package do.not.forget.your.package.here
+
+import net.lulli.metadao.api.MetaDto
+import net.lulli.metadao.helper.sqlite.SQLitePersistenceManager
+import scala.collection.mutable.HashTable
+import scala.collection.mutable.HashTable
+import scala.collection.mutable.HashMap
+import net.lulli.metadao.helper.generic.TypeHelper
+
+
+class DbConnection extends SQLitePersistenceManager(){
+	def initialize(){
+                execute("create table posts ( id char(32), content text, mod_time char(32))")
+	}
+}
+
+object MainWriter{
+
+	def getUuid = java.util.UUID.randomUUID.toString
+
+	def getTimestamp = {
+		val long_template="yyyy-MM-dd'T'HH:mm:ss.SSSZ"
+		val short_template="yyyy-MM-dd"
+		val format = new java.text.SimpleDateFormat(long_template)
+		format.format(new java.util.Date())
+	}
+
+	def main(args: Array[String]): Unit = {
+		
+		var pm = new DbConnection()
+		pm.initialize()
+                var post = MetaDto.getNewInstance("posts")
+		val id_post = getUuid
+                post.put("id", id_post)
+                
+		print("> ")
+		var content = scala.io.StdIn.readLine()
+                post.put("content", content)
+		var tstamp = getTimestamp.toString
+                post.put("mod_time", tstamp)
+		
+                pm.insert(post)
+        }
+}
+__EOD__
+fi
