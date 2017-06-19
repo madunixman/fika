@@ -13,6 +13,24 @@ SCRIPTSDIR=${CURRDIR}/script
 SCRIPT_FILE=${SCRIPTSDIR}/${ONLY_CLASS}".sh"
 #SCRIPT_FILE=${SCRIPTSDIR}/${ONLY_CLASS}
 
+progname_depends_deb=
+progname_depends_rpm=
+progname_version=
+progname_description=
+
+
+function fpmpackage_deb(){
+        fpm --architecture all -s dir -t deb --depends "$progname_depends_deb" -C ${CURRDIR}/dist --name "$progname" --version "$progname_version" --description "$progname_description"
+}
+function fpmpackage_osxpkg(){
+        fpm --architecture all -s dir -t osxpkg --depends "$progname_depends_rpm" -C ${CURRDIR}/dist --name "$progname" --version "$progname_version" --description "$progname_description"
+}
+function fpmpackage_rpm(){
+        fpm --architecture all -s dir -t rpm --depends "$progname_depends_rpm" -C ${CURRDIR}/dist --name "$progname" --version "$progname_version" --description "$progname_description"
+}
+
+
+
 if [ $# -ne 1 ]; then
         echo "Bad param numbers: see manual"
         exit;
