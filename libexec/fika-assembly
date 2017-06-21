@@ -47,9 +47,10 @@ else
 	echo '#! /bin/bash' > ${SCRIPT_FILE}
 	echo "" >> ${SCRIPT_FILE}
 	echo "cd \$(dirname \$0)" >> ${SCRIPT_FILE}
+	echo "" >> ${SCRIPT_FILE}
 	echo "PROG_VERSION=x.y.z" >> ${SCRIPT_FILE}
-	echo "LIBDIR=./lib" >> ${SCRIPT_FILE}
-	echo "TARGETDIR=./target" >> ${SCRIPT_FILE}
+	echo "LIBDIR=../lib" >> ${SCRIPT_FILE}
+	echo "TARGETDIR=../target" >> ${SCRIPT_FILE}
 	echo "TARGET_JAR=${ONLY_CLASS}-\${PROG_VERSION}.jar" >> ${SCRIPT_FILE}
 	echo "" >> ${SCRIPT_FILE}
 

@@ -185,7 +185,7 @@ __EOD__
 addSbtPlugin("org.scala-sbt.plugins" % "sbt-onejar" % "0.8")
 __EOD__
 
- 	cat<<__EOD__>${PROJECTNAME}/script/properties
+ 	cat<<__EOD__>${PROJECTNAME}/script/database.properties
 database.sqlite.JDBC_URL=jdbc:sqlite:/tmp/test.db
 database.sqlite.DRIVER_CLASS_NAME=org.sqlite.JDBC
 database.sqlite.DB_USER=
