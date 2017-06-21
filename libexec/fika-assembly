@@ -18,7 +18,8 @@ SCRIPT_FILE=${SCRIPTSDIR}/${ONLY_CLASS}".sh"
 function fpmpackage_deb(){
 	progname_depends_deb=$1
 	progname_version=$2
-	progname_description=$3
+	progname=$3
+	progname_description=$4
         fpm --architecture all -s dir -t deb --depends "$progname_depends_deb" -C ${CURRDIR}/dist --name "$progname" --version "$progname_version" --description "$progname_description"
 }
 function fpmpackage_osxpkg(){
@@ -87,7 +88,7 @@ __EOL__
 	progname_depends_deb=""
 	progname_version="1.0"
 	progname_description=$progname
-        fpmpackage_deb $progname_depends_deb $progname_version $progname_description
+        fpmpackage_deb $progname_depends_deb $progname $progname_version $progname_description
         #fpmpackage_rpm
 
 
