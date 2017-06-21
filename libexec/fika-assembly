@@ -47,16 +47,17 @@ else
 	echo '#! /bin/bash' > ${SCRIPT_FILE}
 	echo "" >> ${SCRIPT_FILE}
 	echo "cd \$(dirname \$0)" >> ${SCRIPT_FILE}
-	echo "progname_version=x.y.z" >> ${SCRIPT_FILE}
+	echo "PROG_VERSION=x.y.z" >> ${SCRIPT_FILE}
 	echo "LIBDIR=./lib" >> ${SCRIPT_FILE}
-	echo "TARGETDIR=./target/${ONLY_CLASS}-${progname_version}.jar" >> ${SCRIPT_FILE}
+	echo "TARGETDIR=./target" >> ${SCRIPT_FILE}
+	echo "TARGET_JAR=${ONLY_CLASS}-\${PROG_VERSION}.jar" >> ${SCRIPT_FILE}
 	echo "" >> ${SCRIPT_FILE}
 
 	cd ${JARDIR}
 	for l in *.jar; do
 		echo "CP=\${CP}:\${LIBDIR}/${l}">> ${SCRIPT_FILE}
 	done
-	echo "CP=\${CP}:\${TARGETDIR}/${l}">> ${SCRIPT_FILE}
+	echo "CP=\${CP}:\${TARGETDIR}/\${TARGET_JAR}">> ${SCRIPT_FILE}
 	echo "" >> ${SCRIPT_FILE}
 	echo "java -cp \${CP} ${MAIN_CLASS}" >> ${SCRIPT_FILE}
 	chmod 755 ${SCRIPT_FILE}
