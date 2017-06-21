@@ -13,13 +13,12 @@ SCRIPTSDIR=${CURRDIR}/script
 SCRIPT_FILE=${SCRIPTSDIR}/${ONLY_CLASS}".sh"
 #SCRIPT_FILE=${SCRIPTSDIR}/${ONLY_CLASS}
 
-progname_depends_deb=
-progname_depends_rpm=
-progname_version=
-progname_description=
 
 
 function fpmpackage_deb(){
+	progname_depends_deb=$1
+	progname_version=$2
+	progname_description=$3
         fpm --architecture all -s dir -t deb --depends "$progname_depends_deb" -C ${CURRDIR}/dist --name "$progname" --version "$progname_version" --description "$progname_description"
 }
 function fpmpackage_osxpkg(){
@@ -62,4 +61,35 @@ else
 	echo "" >> ${SCRIPT_FILE}
 	echo "java -cp \${CP} ${MAIN_CLASS}" >> ${SCRIPT_FILE}
 	chmod 755 ${SCRIPT_FILE}
+#-------------------------------------------------------------------------
+	progname=${ONLY_CLASS}
+	progname=$(echo "$ONLY_CLASS" | tr '[:upper:]' '[:lower:]')
+	test -d ${CURRDIR}/dist/usr/share/$progname || mkdir -p ${CURRDIR}/dist/usr/share/$progname
+        cp ${CURRDIR}/lib/* ${CURRDIR}/dist/usr/share/$progname
+        cp ${GROOVY_EMBED_JAR} ${CURRDIR}/dist/usr/share/$progname
+        cp ${CURRDIR}/groovy-$progname.jar ${CURRDIR}/dist/usr/share/$progname
+        test -d ${CURRDIR}/dist/bin || mkdir -p ${CURRDIR}/dist/bin
+        cd ${CURRDIR}/dist
+
+        echo "#! /bin/bash" >${CURRDIR}/dist/bin/$progname
+        echo "prefix=\"/usr\"" >>${CURRDIR}/dist/bin/$progname
+        cd ${CURRDIR}/dist/usr/share/$progname
+
+        for D in *.jar; do
+                CP=${CP}:"\$prefix/share/$progname/${D}"
+        done
+
+        cat <<__EOL__ >>${CURRDIR}/dist/bin/$progname
+java -cp ${CP} ${MAIN_CLASS}
+__EOL__
+        chmod 755 ${CURRDIR}/dist/bin/$progname
+        cd ${CURRDIR}
+	progname_depends_deb=""
+	progname_version="1.0"
+	progname_description=$progname
+        fpmpackage_deb $progname_depends_deb $progname_version $progname_description
+        #fpmpackage_rpm
+
+
+
 fi
