@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/usr/bin/env bash 
 # Usage: fika assembly | -a | --assembly fully.qualified.class.Name
 # Summary: builds an assembly with every jar dependency and a Name.sh shell script
 # Help: this command builds an assembly with every jar dependency and a  shell script
