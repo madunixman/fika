@@ -1,0 +1,265 @@
+#! /usr/bin/env bash
+# Usage: fika project:java9 <project-name> 
+# Summary: creates a new modular Java 9 project <project-name> in the current directory
+# Help: This command is useful to create boilerplate for java9 modular projects
+
+
+if [ $# -ne 1 ]; then
+	echo "Bad param numbers: see manual"
+	exit;
+else
+	PROJECTNAME=$1
+	lowProject=$(echo "$PROJECTNAME" | tr '[:upper:]' '[:lower:]')
+	if [ "$MVN_GROUPID" = "" ]; then
+		echo -ne "Group Id: "; read mvn_groupid
+	else
+		mvn_groupid=${MVN_GROUPID}
+	fi 
+	
+	rel_path=$(echo ${mvn_groupid}| sed -e 's/\./\//g')
+
+	modMain="${mvn_groupid}.${lowProject}.modmain"
+	modZero="${mvn_groupid}.${lowProject}.modzero"
+	
+	echo -ne "Description: "; read mvn_description
+	mkdir -p ${PROJECTNAME}/script
+	mkdir -p ${PROJECTNAME}/${modMain}/src/main/java
+	mkdir -p ${PROJECTNAME}/${modMain}/src/main/java/${rel_path}/${PROJECTNAME}/modmain
+	mkdir -p ${PROJECTNAME}/${modMain}/src/main/resources
+	mkdir -p ${PROJECTNAME}/${modMain}/src/main/webapp
+	mkdir -p ${PROJECTNAME}/${modMain}/src/test/resources
+	mkdir -p ${PROJECTNAME}/${modMain}/src/test/java
+
+	mkdir -p ${PROJECTNAME}/${modZero}/src/main/java
+	mkdir -p ${PROJECTNAME}/${modZero}/src/main/java/${rel_path}/${PROJECTNAME}/modzero
+	mkdir -p ${PROJECTNAME}/${modZero}/src/main/resources
+	mkdir -p ${PROJECTNAME}/${modZero}/src/main/webapp
+	mkdir -p ${PROJECTNAME}/${modZero}/src/test/resources
+	mkdir -p ${PROJECTNAME}/${modZero}/src/test/java
+
+ 	cat<<__EOD__>${PROJECTNAME}/script/build_image.sh
+#! /bin/bash -x
+
+IMAGE_DIR=jre.${PROJECTNAME}
+cd \$(dirname \$0)
+
+jlink --module-path $JAVA_HOME/jmods:../mods \\
+	--add-modules ${mvn_groupid}.${PROJECTNAME}.modmain\\
+	--output \${IMAGE_DIR}
+__EOD__
+
+ 	cat<<__EOD__>${PROJECTNAME}/script/run_image.sh
+#! /bin/bash -x
+
+IMAGE_DIR=jre.${PROJECTNAME}
+cd \$(dirname \$0)
+
+\${IMAGE_DIR}/bin/java -m ${mvn_groupid}.${PROJECTNAME}.modmain/${mvn_groupid}.${PROJECTNAME}.modmain.Main
+	 
+__EOD__
+
+chmod 755 ${PROJECTNAME}/script/build_image.sh
+chmod 755 ${PROJECTNAME}/script/run_image.sh
+
+ 	cat<<__EOD__>${PROJECTNAME}/${modMain}/src/main/java/${rel_path}/${PROJECTNAME}/modmain/Main.java
+package ${mvn_groupid}.${PROJECTNAME}.modmain;
+
+import ${mvn_groupid}.${PROJECTNAME}.modzero.ZeroUtils;
+
+public class Main{
+	public static void main(String s[]){
+		String retString = ZeroUtils.getInfo();
+		System.out.println(retString);
+	}
+}
+__EOD__
+ 	cat<<__EOD__>${PROJECTNAME}/${modZero}/src/main/java/${rel_path}/${PROJECTNAME}/modzero/ZeroUtils.java
+package ${mvn_groupid}.${PROJECTNAME}.modzero;
+
+public class ZeroUtils{
+	public static String getInfo(){
+		return "Using ${mvn_groupid}.${PROJECTNAME}.modzero.ZeroUtils.getInfo()";
+	}
+}
+__EOD__
+ 	cat<<__EOD__>${PROJECTNAME}/${modMain}/src/main/java/module-info.java
+module ${modMain} {
+    requires ${modZero};
+}
+__EOD__
+
+ 	cat<<__EOD__>${PROJECTNAME}/${modZero}/src/main/java/module-info.java
+module ${modZero} {
+	exports ${modZero};
+    //uses something;...
+}
+__EOD__
+
+ 	cat<<__EOD__>${PROJECTNAME}/${modMain}/pom.xml
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <parent>
+        <groupId>${mvn_groupid}.${lowProject}</groupId>
+        <artifactId>${PROJECTNAME}</artifactId>
+        <version>0.0.1</version>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+
+    <artifactId>${PROJECTNAME}-${modMain}</artifactId>
+
+    <dependencies>
+	<!-- put your dependencies here -->
+	<dependency>
+	        <groupId>${mvn_groupid}.${lowProject}</groupId>
+        	<artifactId>${PROJECTNAME}-${modZero}</artifactId>
+        	<version>0.0.1</version>
+	</dependency>
+
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <version>2.3.1</version>
+                <configuration>
+                    <outputDirectory>../mods</outputDirectory>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+</project>
+__EOD__
+
+ 	cat<<__EOD__>${PROJECTNAME}/${modZero}/pom.xml
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <parent>
+        <groupId>${mvn_groupid}.${lowProject}</groupId>
+        <artifactId>${PROJECTNAME}</artifactId>
+        <version>0.0.1</version>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+
+    <artifactId>${PROJECTNAME}-${modZero}</artifactId>
+
+    <dependencies>
+	<!-- put your dependencies here -->
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <version>2.3.1</version>
+                <configuration>
+                    <outputDirectory>../mods</outputDirectory>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+</project>
+__EOD__
+
+ 	cat<<__EOD__>${PROJECTNAME}/pom.xml
+<project>
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>${mvn_groupid}.${lowProject}</groupId>
+  <artifactId>${PROJECTNAME}</artifactId>
+  <version>0.0.1</version>
+  <packaging>pom</packaging>
+  <description>${mvn_description}</description>
+  <!-- homepage for the project  ${PROJECTNAME}-->
+  <!-- EG: <url>http://dev.lulli.net/projects/${PROJECTNAME}</url>-->
+<!-- for distribution of artifact into the repo -->
+<!-- ****************************************** -->
+
+    <modules>
+        <module>${modMain}</module>
+        <module>${modZero}</module>
+    </modules>
+
+    <properties>
+        <maven.compiler.source>1.9</maven.compiler.source>
+        <maven.compiler.target>1.9</maven.compiler.target>
+        <maven.compiler.release>9</maven.compiler.release>
+    </properties>
+
+<build>
+<plugins>
+	        <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-compiler-plugin</artifactId>
+                    <version>3.6.0</version>
+            </plugin>
+<!--
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-toolchains-plugin</artifactId>
+                <version>1.1</version>
+                <configuration>
+                    <toolchains>
+                        <jdk>
+                            <version>1.9</version>
+                            <vendor>oracle</vendor>
+                        </jdk>
+                    </toolchains>
+                </configuration>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>toolchain</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+-->
+</plugins>
+ <extensions>
+    <extension>
+        <groupId>org.apache.maven.wagon</groupId>
+        <artifactId>wagon-ssh</artifactId>
+        <version>2.8</version>
+    </extension>
+ </extensions>
+</build>
+<!-- 
+ Kindly include the following params into your settings.xml
+ if you want to upload to your own repo 
+-->
+<distributionManagement>
+    <repository>
+      <id>\${repository.id}</id>
+      <name>\${repository.name}</name>
+      <url>\${repository.url}</url>
+    </repository>
+    <site>
+      <id>\${repository.id}</id>
+      <name>\${repository.name}</name>
+      <url>\${repository.site.url}</url>
+    </site>
+</distributionManagement>
+<!-- ****************************************** -->
+
+<dependencies>
+  <dependency>
+    <groupId>log4j</groupId>
+    <artifactId>log4j</artifactId>
+    <version>1.2.17</version>
+  </dependency>
+</dependencies>
+
+
+</project>
+__EOD__
+
+
+fi
+
+# Paolo Lulli 2017 - www.lulli.net 
