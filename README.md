@@ -1,10 +1,10 @@
 # fika-utils 
-A commandline survival kit for Java developers
+A commandline survival kit for developers on the JVM
 
 Paolo Lulli 2016 - paolo AT lulli.net
 
 fika-utils is a collection of commandline utilities to automate frequent tasks in the
-Java world such as:
+Java/Groovy/Scala world such as:
 
 *	Finding which jar contains a given Class
 *	Generate Ant project                      
