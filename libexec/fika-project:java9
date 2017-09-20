@@ -43,7 +43,7 @@ else
 IMAGE_DIR=jre.${PROJECTNAME}
 cd \$(dirname \$0)
 
-jlink --module-path $JAVA_HOME/jmods:../mods \\
+jlink --module-path \$JAVA_HOME/jmods:../mods \\
 	--add-modules ${mvn_groupid}.${PROJECTNAME}.modmain\\
 	--output \${IMAGE_DIR}
 __EOD__
