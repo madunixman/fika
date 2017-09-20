@@ -28,6 +28,11 @@ Searching StreamFactory in /home/pielle/dev
 /home/pielle/dev/github/shape-spring/shape-spring-web/target/shape-spring-pack/WEB-INF/lib/spring-jdbc-4.1.6.RELEASE.jar contains: [org/springframework/jdbc/datasource/embedded/OutputStreamFactory.class
 </code>
 
+### fika project:java9  &lt;project-name&gt;
+
+This command generates a Java 9 template project with 2 modules and a script to build a cut-down 
+JRE containing only your own modules (about 40M size overall)
+
 ### fika [ project:android | -pA | --project-android ]  &lt;project-name&gt;
 
 This command generates an Android project
