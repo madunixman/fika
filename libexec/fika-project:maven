@@ -22,12 +22,6 @@ else
 	mkdir -p ${PROJECTNAME}/src/main/webapp
 	mkdir -p ${PROJECTNAME}/src/test/java
 	mkdir -p ${PROJECTNAME}/src/test/resources
- 	cat<<__EOD__>${PROJECTNAME}/src/main/resources/build.properties
-build.version=${pom.version}
-build.date=${timestamp}
-build.url=${pom.url}
-build.name=${pom.name}
-__EOD__
  	cat<<__EOD__>${PROJECTNAME}/pom.xml
 <project>
   <modelVersion>4.0.0</modelVersion>
@@ -39,17 +33,7 @@ __EOD__
   <!-- EG: <url>http://dev.lulli.net/projects/${PROJECTNAME}</url>-->
 <!-- for distribution of artifact into the repo -->
 <!-- ****************************************** -->
-    <properties>
-        <timestamp>${maven.build.timestamp}</timestamp>
-        <maven.build.timestamp.format>yyyyMMddHHmmss</maven.build.timestamp.format>
-    </properties>
 <build>
-        <resources>
-            <resource>
-                <directory>src/main/resources</directory>
-                <filtering>true</filtering>
-            </resource>
-        </resources>
  <extensions>
     <extension>
         <groupId>org.apache.maven.wagon</groupId>
