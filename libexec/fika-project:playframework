@@ -1,0 +1,22 @@
+#! /usr/bin/env bash
+# Usage: fika project:play <project-name> 
+# Summary: creates a new Scala project using Play Framework <project-name> in the current directory
+# Help: This command is useful to create skeleton for Play Framework projects
+
+#./bin/play-scala-starter-example  -J-Xms1280M -J-Xmx5120m -J-server -Dhttp.port=8080
+
+if [ $# -ne 1 ]; then
+	echo "Bad param numbers: see manual"
+	exit;
+else
+	PROJECTNAME=$1
+	lowProject=$(echo "$PROJECTNAME" | tr '[:upper:]' '[:lower:]')
+	if [ "$MVN_GROUPID" = "" ]; then
+		echo -ne "Group Id: "; read mvn_groupid
+	else
+		mvn_groupid=${MVN_GROUPID}
+	fi 
+	
+	echo -ne "Description: "; read mvn_description
+	sbt new playframework/play-scala-seed.g8 --name=${lowProject}
+fi
