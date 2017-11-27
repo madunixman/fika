@@ -1,0 +1,355 @@
+#! /usr/bin/env bash
+# Usage: fika project:embedrest <project-name> 
+# Summary: creates a RestEasy web project <project-name> in the current directory
+# Help: This command is useful to create maven boilerplate for simple webapps embedding tomcat and RestEasy
+
+
+if [ $# -ne 1 ]; then
+	echo "Bad param numbers: see manual"
+	exit;
+else
+	PROJECTNAME=$1
+	lowProject=$(echo "$PROJECTNAME" | tr '[:upper:]' '[:lower:]')
+	if [ "$MVN_GROUPID" = "" ]; then
+		echo -ne "Group Id: "; read mvn_groupid
+	else
+		mvn_groupid=${MVN_GROUPID}
+	fi 
+	
+	echo -ne "Description: "; read mvn_description
+	mkdir -p ${PROJECTNAME}/src/main/java
+	mkdir -p ${PROJECTNAME}/src/main/resources
+	mkdir -p ${PROJECTNAME}/src/main/webapp
+	mkdir -p ${PROJECTNAME}/src/main/webapp/WEB-INF
+	mkdir -p ${PROJECTNAME}/src/main/java/rest/services
+	mkdir -p ${PROJECTNAME}/src/main/java/server/tomcat
+	mkdir -p ${PROJECTNAME}/src/test/java
+	mkdir -p ${PROJECTNAME}/src/test/resources
+ 	cat<<__EOD__>${PROJECTNAME}/src/main/webapp/index.html
+<html>
+<head><title>${PROJECTNAME}</title></head>
+<body><h1>${PROJECTNAME}</h1>
+
+</body>
+</html>
+__EOD__
+
+
+cat<<__EOD__>${PROJECTNAME}/src/main/java/rest/RestEasyApplication.java
+package rest;
+import rest.services.FirstService;
+import rest.services.SecondService;
+
+import java.util.HashSet;
+import java.util.Set;
+
+import javax.ws.rs.core.Application;
+
+public class RestEasyApplication extends Application {
+
+    private Set<Object> singletons = new HashSet<Object>();
+
+    public RestEasyApplication() {
+        singletons.add(new FirstService());
+        singletons.add(new SecondService());
+    }
+
+    @Override
+    public Set<Object> getSingletons() {
+        return singletons;
+    }
+}
+__EOD__
+
+
+cat<<__EOD__>${PROJECTNAME}/src/main/java/server/tomcat/TomcatRunner.java
+package server.tomcat;
+
+
+import org.apache.catalina.Context;
+import org.apache.catalina.startup.Tomcat;
+import org.jboss.resteasy.plugins.server.servlet.HttpServletDispatcher;
+import org.jboss.resteasy.plugins.server.servlet.ResteasyBootstrap;
+import rest.RestEasyApplication;
+
+public class TomcatRunner {
+
+    private static final String RESTEASY_SERVLET_NAME = "resteasy-servlet";
+
+    public static void main(String[] args) throws Exception {
+
+        String webappDirLocation = "src/main/webapp/";
+        Tomcat tomcat = new Tomcat();
+
+        String webPort = System.getenv("PORT");
+        //if(webPort == null || webPort.isEmpty()) {
+            webPort = "8080";
+        //}
+
+        String contextPath = "/api";
+        String appBase = ".";
+
+        tomcat.setPort(Integer.valueOf(webPort));
+        tomcat.getHost().setAppBase(appBase);
+
+        Context context = tomcat.addContext(contextPath, appBase);
+        context.addApplicationListener(ResteasyBootstrap.class.getName());
+        Tomcat.addServlet(context, RESTEASY_SERVLET_NAME, new HttpServletDispatcher());
+        context.addParameter("javax.ws.rs.Application", RestEasyApplication.class.getName());
+        context.addServletMapping("/*", RESTEASY_SERVLET_NAME);
+
+
+        tomcat.start();
+        tomcat.getServer().await();
+    }
+}
+
+__EOD__
+
+cat<<__EOD__>${PROJECTNAME}/src/main/java/rest/services/FirstService.java
+package rest.services;
+import javax.ws.rs.Consumes;
+import javax.ws.rs.GET;
+import javax.ws.rs.POST;
+import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+import java.util.Hashtable;
+
+@Path("/first")
+public class FirstService {
+
+
+    @GET
+    @Path("/method1")
+    @Produces("application/json")
+    public Response method1(@QueryParam("param1") String param1) {
+        Hashtable resultMap = new Hashtable();
+        resultMap.put("method", "method1");
+        if (null != param1) {
+            resultMap.put("param1", param1);
+        }
+        return Response
+                .status(200)
+                .entity(resultMap)
+                .build();
+    }
+
+    @POST
+    @Path("/method2")
+    @Consumes("application/json")
+    @Produces("application/json")
+    public Response method2(@QueryParam("param2") String param2) {
+        Hashtable resultMap = new Hashtable();
+        resultMap.put("method", "method2");
+        if (null != param2) {
+            resultMap.put("param2", param2);
+        }
+        return Response
+                .status(200)
+                .entity(resultMap)
+                .build();
+    }
+
+}
+
+__EOD__
+
+cat<<__EOD__>${PROJECTNAME}/src/main/java/rest/services/SecondService.java
+package rest.services;
+
+import javax.ws.rs.*;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+import java.util.Hashtable;
+
+@Path("/second")
+public class SecondService {
+    @GET
+    @Path("/method3")
+    @Produces("application/json")
+    public Response method3(@QueryParam("param3") String param1) {
+        Hashtable resultMap = new Hashtable();
+        resultMap.put("method", "method1");
+        if (null != param1) {
+            resultMap.put("param1", param1);
+        }
+        return Response
+                .status(200)
+                .entity(resultMap)
+                .build();
+    }
+
+    @POST
+    @Path("/method4")
+    @Consumes("application/json")
+    @Produces("application/json")
+    public Response method4(@QueryParam("param4") String param2) {
+        Hashtable resultMap = new Hashtable();
+        resultMap.put("method", "method2");
+        if (null != param2) {
+            resultMap.put("param2", param2);
+        }
+        return Response
+                .status(200)
+                .entity(resultMap)
+                .build();
+    }
+}
+
+__EOD__
+
+cat<<__EOD__>${PROJECTNAME}/src/main/webapp/WEB-INF/web.xml
+<!DOCTYPE web-app PUBLIC
+ "-//Sun Microsystems, Inc.//DTD Web Application 2.3//EN"
+ "http://java.sun.com/dtd/web-app_2_3.dtd" >
+
+<web-app>
+  <display-name>${PROJECTNAME}</display-name>
+  <welcome-file-list>
+    <welcome-file>index.html</welcome-file>
+    <!-- No fucking jsp in here -->
+  </welcome-file-list>
+  <servlet>
+    <description></description>
+    <display-name>${PROJECTNAME}</display-name>
+    <servlet-name>${PROJECTNAME}</servlet-name>
+    <servlet-class>${MVN_GROUPID}.${PROJECTNAME}</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>${PROJECTNAME}</servlet-name>
+    <url-pattern>/${PROJECTNAME}</url-pattern>
+  </servlet-mapping>
+
+</web-app>
+
+__EOD__
+
+cat<<__EOD__>${PROJECTNAME}/pom.xml
+<project>
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>${mvn_groupid}.${lowProject}</groupId>
+  <artifactId>${PROJECTNAME}</artifactId>
+  <version>0.0.1</version>
+  <description>${mvn_description}</description>
+  <!-- homepage for the project  ${PROJECTNAME}-->
+  <!-- EG: <url>http://dev.lulli.net/projects/${PROJECTNAME}</url>-->
+<!-- for distribution of artifact into the repo -->
+<!-- ****************************************** -->
+<properties>
+    <tomcat.version>8.5.2</tomcat.version>
+<resteasy.version>3.0.14.Final</resteasy.version>
+</properties>
+
+<repositories>
+           <repository>
+              <id>dev.lulli.net</id>
+              <url>http://dev.lulli.net/maven</url>
+            </repository>
+ </repositories>
+
+<build>
+      <plugins>
+        <plugin>
+            <groupId>org.codehaus.mojo</groupId>
+            <artifactId>appassembler-maven-plugin</artifactId>
+            <version>2.0.0</version>
+            <configuration>
+                <assembleDirectory>target</assembleDirectory>
+                <programs>
+                    <program>
+                        <mainClass>server.tomcat.TomcatRunner</mainClass>
+                        <name>$lowProject</name>
+                    </program>
+                </programs>
+            </configuration>
+            <executions>
+                <execution>
+                    <phase>package</phase>
+                    <goals>
+                        <goal>assemble</goal>
+                    </goals>
+                </execution>
+            </executions>
+        </plugin>
+    </plugins>
+
+ <extensions>
+    <extension>
+        <groupId>org.apache.maven.wagon</groupId>
+        <artifactId>wagon-ssh</artifactId>
+        <version>2.8</version>
+    </extension>
+ </extensions>
+</build>
+<!-- 
+ Kindly include the following params into your settings.xml
+ if you want to upload to your own repo 
+-->
+<distributionManagement>
+    <repository>
+      <id>\${repository.id}</id>
+      <name>\${repository.name}</name>
+      <url>\${repository.url}</url>
+    </repository>
+    <site>
+      <id>\${repository.id}</id>
+      <name>\${repository.name}</name>
+      <url>\${repository.site.url}</url>
+    </site>
+</distributionManagement>
+<!-- ****************************************** -->
+  <dependencies>
+    <dependency>
+      <groupId>org.apache.tomcat.embed</groupId>
+      <artifactId>tomcat-embed-core</artifactId>
+      <version>\${tomcat.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.tomcat.embed</groupId>
+      <artifactId>tomcat-embed-logging-juli</artifactId>
+      <version>\${tomcat.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.tomcat.embed</groupId>
+      <artifactId>tomcat-embed-jasper</artifactId>
+      <version>\${tomcat.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.tomcat</groupId>
+      <artifactId>tomcat-jasper</artifactId>
+      <version>\${tomcat.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.tomcat</groupId>
+      <artifactId>tomcat-jasper-el</artifactId>
+      <version>\${tomcat.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.tomcat</groupId>
+      <artifactId>tomcat-jsp-api</artifactId>
+      <version>\${tomcat.version}</version>
+    </dependency>
+    <dependency>
+        <groupId>org.jboss.resteasy</groupId>
+        <artifactId>resteasy-servlet-initializer</artifactId>
+        <version>\${resteasy.version}</version>
+    </dependency>
+    <dependency>
+        <groupId>org.jboss.resteasy</groupId>
+        <artifactId>resteasy-client</artifactId>
+        <version>\${resteasy.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.jboss.resteasy</groupId>
+      <artifactId>resteasy-jackson-provider</artifactId>
+      <version>\${resteasy.version}</version>
+    </dependency>
+  </dependencies>
+</project>
+
+__EOD__
+
+fi
