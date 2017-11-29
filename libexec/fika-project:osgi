@@ -1,0 +1,193 @@
+#! /usr/bin/env bash
+# Usage: fika project:osgi <project-name> 
+# Summary: creates a new Osgi project <project-name> in the current directory
+# Help: This command is useful to create usual Osgi boilerplate 
+
+
+if [ $# -ne 1 ]; then
+	echo "Bad param numbers: see manual"
+	exit;
+else
+	PROJECTNAME=$1
+	lowProject=$(echo "$PROJECTNAME" | tr '[:upper:]' '[:lower:]')
+	if [ "$MVN_GROUPID" = "" ]; then
+		echo -ne "Group Id: "; read mvn_groupid
+	else
+		mvn_groupid=${MVN_GROUPID}
+	fi 
+	
+	echo -ne "Description: "; read mvn_description
+	mkdir -p ${PROJECTNAME}/src/main/java
+	mkdir -p ${PROJECTNAME}/src/main/resources
+	mkdir -p ${PROJECTNAME}/src/main/webapp
+	mkdir -p ${PROJECTNAME}/src/test/java
+	mkdir -p ${PROJECTNAME}/src/test/resources
+
+	mkdir -p ${PROJECTNAME}/src/main/java/net/test
+	mkdir -p ${PROJECTNAME}/src/main/java/net/test/internal
+
+cat<<__EOD__>${PROJECTNAME}/src/main/java/net/test/OsgiService.java
+package net.test;
+
+import java.util.Map;
+
+import org.apache.felix.scr.annotations.Activate;
+import org.apache.felix.scr.annotations.Component;
+import org.apache.felix.scr.annotations.ConfigurationPolicy;
+import org.apache.felix.scr.annotations.Deactivate;
+import org.apache.felix.scr.annotations.Service;
+
+@Component (label = "OsgiService", immediate = true, policy = ConfigurationPolicy.OPTIONAL)
+@Service (value = { OsgiService.class })
+public class OsgiService implements ServiceInterface
+{
+    String status;
+
+    @Activate
+    public void activate(final Map<String, ?> config)
+    {
+	System.out.println("START");
+    }
+
+
+    @Deactivate
+    public void deactivate()
+    {
+	System.out.println("STOP");
+    }
+
+    @Override
+    public String exampleMethod()
+    {
+        return null;
+    }
+
+}
+
+__EOD__
+
+
+cat<<__EOD__>${PROJECTNAME}/src/main/java/net/test/ServiceInterface.java
+package net.test;
+
+public interface ServiceInterface
+{
+       String exampleMethod();
+}
+__EOD__
+
+cat<<__EOD__>${PROJECTNAME}/pom.xml
+<project>
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>${mvn_groupid}.${lowProject}</groupId>
+  <artifactId>${PROJECTNAME}</artifactId>
+  <version>0.0.1</version>
+  <description>${mvn_description}</description>
+  <name>${PROJECTNAME}</name>
+  <packaging>bundle</packaging>
+
+<!-- for distribution of artifact into the repo -->
+<!-- ****************************************** -->
+<build>
+ <extensions>
+    <extension>
+        <groupId>org.apache.maven.wagon</groupId>
+        <artifactId>wagon-ssh</artifactId>
+        <version>2.8</version>
+    </extension>
+ </extensions>
+   <plugins>
+      <plugin>
+        <groupId>org.apache.felix</groupId>
+        <artifactId>maven-bundle-plugin</artifactId>
+        <extensions>true</extensions>
+        <configuration>
+          <instructions>
+            <Bundle-SymbolicName>osgitest</Bundle-SymbolicName>
+            <Bundle-Version>\${project.version}</Bundle-Version>
+            <Import-Package>*;resolution:=optional</Import-Package>
+            <Export-Package>net.test.*;version="\${project.version}"</Export-Package>
+          </instructions>
+        </configuration>
+      </plugin>
+      <plugin>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <configuration>
+          <source>1.8</source>
+          <target>1.8</target>
+        </configuration>
+      </plugin>
+      <plugin>
+        <artifactId>maven-assembly-plugin</artifactId>
+        <configuration>
+          <descriptorRefs>
+            <descriptorRef>jar-with-dependencies</descriptorRef>
+          </descriptorRefs>
+        </configuration>
+      </plugin>
+           <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>2.0.2</version>
+                <configuration>
+                    <source>1.8</source>
+                    <target>1.8</target>
+                </configuration>
+            </plugin>
+<plugin>
+    <groupId>org.apache.felix</groupId>
+    <artifactId>maven-scr-plugin</artifactId>
+    <executions>
+        <execution>
+            <id>generate-scr-scrdescriptor</id>
+            <goals>
+                <goal>scr</goal>
+            </goals>
+        </execution>
+    </executions>
+</plugin>
+    </plugins>
+  </build>
+<!-- 
+ Kindly include the following params into your settings.xml
+ if you want to upload to your own repo 
+-->
+<distributionManagement>
+    <repository>
+      <id>\${repository.id}</id>
+      <name>\${repository.name}</name>
+      <url>\${repository.url}</url>
+    </repository>
+    <site>
+      <id>\${repository.id}</id>
+      <name>\${repository.name}</name>
+      <url>\${repository.site.url}</url>
+    </site>
+</distributionManagement>
+<!-- ****************************************** -->
+
+<dependencies>
+   <dependency>
+       <groupId>org.apache.felix</groupId>
+       <artifactId>org.osgi.core</artifactId>
+       <version>1.4.0</version>
+   </dependency>
+   <dependency>
+       <groupId>org.apache.felix</groupId>
+       <artifactId>org.apache.felix.scr.annotations</artifactId>
+       <version>1.11.0</version>
+   </dependency>
+   <dependency>
+        <groupId>org.apache.felix</groupId>
+        <artifactId>org.osgi.core</artifactId>
+        <version>1.0.0</version>
+   </dependency>
+</dependencies>
+
+
+</project>
+
+__EOD__
+
+
+fi
