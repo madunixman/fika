@@ -118,16 +118,24 @@ else
 __EOD__
 
  	cat<<__EOD__>${PROJECTNAME}/build.sbt
-import com.github.retronym.SbtOneJar._
-
-scalaVersion := "2.11.8"
-oneJarSettings
+scalaVersion := "2.12.2"
 
 libraryDependencies += "commons-lang" % "commons-lang" % "2.6"
+
+//resolvers += DefaultMavenRepository
+//resolvers += "dev.lulli.net" at "http://dev.lulli.net/maven"
 __EOD__
 
  	cat<<__EOD__>${PROJECTNAME}/project/plugins.sbt
-addSbtPlugin("org.scala-sbt.plugins" % "sbt-onejar" % "0.8")
+addSbtPlugin("org.ensime" % "sbt-ensime" % "2.1.0")
 __EOD__
+
+ 	cat<<__EOD__>${PROJECTNAME}/ensime.sbt
+ensimeIgnoreScalaMismatch in ThisBuild := true
+__EOD__
+
+cd ${PROJECTNAME}
+sbt ensimeConfig &
+cd -
 
 fi
