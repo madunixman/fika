@@ -33,7 +33,7 @@ else
   <version>0.0.1</version>
   <description>${mvn_description}</description>
   <!-- homepage for the project  ${PROJECTNAME}-->
-  <!-- EG: <url>http://dev.lulli.net/projects/${PROJECTNAME}</url>-->
+  <!-- EG: <url>http://code.lulli.net/projects/${PROJECTNAME}</url>-->
 
   <properties>
     <encoding>UTF-8</encoding>
@@ -42,8 +42,8 @@ else
 
 <repositories>
            <repository>
-              <id>dev.lulli.net</id>
-              <url>http://dev.lulli.net/maven</url>
+              <id>code.lulli.net</id>
+              <url>https://code.lulli.net/maven</url>
             </repository>
  </repositories>
 
@@ -179,7 +179,7 @@ libraryDependencies += "net.lulli" % "metadao" % "1.0.2"
 libraryDependencies += "org.xerial" % "sqlite-jdbc" % "3.15.1"
 
 resolvers += DefaultMavenRepository
-resolvers += "dev.lulli.net" at "http://dev.lulli.net/maven"
+resolvers += "code.lulli.net" at "https://code.lulli.net/maven"
 
 enablePlugins(JavaAppPackaging)
 

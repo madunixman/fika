@@ -31,7 +31,7 @@ else
   <version>0.0.1</version>
   <description>${mvn_description}</description>
   <!-- homepage for the project  ${PROJECTNAME}-->
-  <!-- EG: <url>http://dev.lulli.net/projects/${PROJECTNAME}</url>-->
+  <!-- EG: <url>http://code.lulli.net/projects/${PROJECTNAME}</url>-->
 
   <properties>
     <encoding>UTF-8</encoding>
@@ -123,7 +123,7 @@ scalaVersion := "2.12.2"
 libraryDependencies += "commons-lang" % "commons-lang" % "2.6"
 
 //resolvers += DefaultMavenRepository
-//resolvers += "dev.lulli.net" at "http://dev.lulli.net/maven"
+//resolvers += "code.lulli.net" at "https://code.lulli.net/maven"
 __EOD__
 
  	cat<<__EOD__>${PROJECTNAME}/project/plugins.sbt

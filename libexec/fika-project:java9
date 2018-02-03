@@ -176,7 +176,7 @@ __EOD__
   <packaging>pom</packaging>
   <description>${mvn_description}</description>
   <!-- homepage for the project  ${PROJECTNAME}-->
-  <!-- EG: <url>http://dev.lulli.net/projects/${PROJECTNAME}</url>-->
+  <!-- EG: <url>https://code.lulli.net/projects/${PROJECTNAME}</url>-->
 <!-- for distribution of artifact into the repo -->
 <!-- ****************************************** -->
 

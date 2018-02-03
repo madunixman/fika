@@ -124,7 +124,7 @@ __EOD__
   <version>0.0.1</version>
   <description>${mvn_description}</description>
   <!-- homepage for the project  ${PROJECTNAME}-->
-  <!-- EG: <url>http://dev.lulli.net/projects/${PROJECTNAME}</url>-->
+  <!-- EG: <url>http://code.lulli.net/projects/${PROJECTNAME}</url>-->
 <!-- for distribution of artifact into the repo -->
 <!-- ****************************************** -->
 <build>
