@@ -17,7 +17,6 @@ else
 	fi 
 	
 	echo -ne "Description: "; read mvn_description
-	mkdir -p ${PROJECTNAME}/project
 	mkdir -p ${PROJECTNAME}/src/main/scala
 	mkdir -p ${PROJECTNAME}/src/main/resources
 	mkdir -p ${PROJECTNAME}/src/main/webapp
@@ -144,11 +143,9 @@ __EOD__
  	cat<<__EOD__>${PROJECTNAME}/build.sbt
 scalaVersion := "2.11.8"
 libraryDependencies += "org.apache.spark" %% "spark-sql" % "2.2.0"
+libraryDependencies += "org.apache.spark" % "spark-mllib_2.11" % "2.2.0"
 __EOD__
 
- 	cat<<__EOD__>${PROJECTNAME}/project/plugins.sbt
-addSbtPlugin("org.scala-sbt.plugins" % "sbt-onejar" % "0.8")
-__EOD__
 
  cat<<__EOD__>${PROJECTNAME}/src/main/scala/CorrelationApp.scala
 import org.apache.spark.ml.linalg.{Matrix, Vectors}
