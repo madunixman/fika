@@ -144,8 +144,6 @@ __EOD__
         </configuration>
       </plugin>
     </plugins>
-<!--  For ReastEasy build -->
-
 </build>
 <!-- 
  Kindly include the following params into your settings.xml
